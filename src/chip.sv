@@ -1,48 +1,31 @@
 `default_nettype none
 
+// `include "types.vh"
+// `include "reg_file.sv"
+// `include "alu.sv"
+// `include "control.sv"
+// `include "components.sv"
+// `include "decode.sv"
+
 module my_chip (
     input logic [11:0] io_in, // Inputs to your chip
     output logic [11:0] io_out, // Outputs from your chip
     input logic clock,
     input logic reset // Important: Reset is ACTIVE-HIGH
 );
-    
+
     // Basic counter design as an example
-    // TODO: remove the counter design and use this module to insert your own design
-    // DO NOT change the I/O header of this design
 
-    wire [6:0] led_out;
-    assign io_out[6:0] = led_out;
-
-    // external clock is 1000Hz, so need 10 bit counter
-    reg [9:0] second_counter;
-    reg [3:0] digit;
-
-    always @(posedge clock) begin
-        // if reset, set counter to 0
-        if (reset) begin
-            second_counter <= 0;
-            digit <= 0;
-        end else begin
-            // if up to 16e6
-            if (second_counter == 1000) begin
-                // reset
-                second_counter <= 0;
-
-                // increment digit
-                digit <= digit + 1'b1;
-
-                // only count from 0 to 9
-                if (digit == 9)
-                    digit <= 0;
-
-            end else
-                // increment counter
-                second_counter <= second_counter + 1'b1;
-        end
-    end
-
-    // instantiate segment display
-    seg7 seg7(.counter(digit), .segments(led_out));
+    cpu_core cpu(       .clk(clock),
+                        .rst(reset),
+                        .ard_clk(io_in[10]),
+                        .ard_data_ready(io_in[9]),
+                        .ard_receive_ready(io_in[8]),
+                        .in_bus(io_in[7:0]),
+                        .out_bus(io_out[7:0]),
+                        .bus_pc(io_out[8]),
+                        .bus_mar(io_out[9]),
+                        .bus_mdr(io_out[10]),
+                        .halt(io_out[11]));
 
 endmodule
