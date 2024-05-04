@@ -16,4 +16,4 @@ The 12 input pins are the input bus, ard_data_ready, ard_receive_ready, and ard_
 ## Hardware Peripherals
 The only hardware peripheral is the Arduino/Raspberry Pi
 ## Design Testing / Bringup
-In order to test the design, hook up an arduino to the inputs of the chip, and map the pins of the Arduino such that each IO is somewhere you can read from it. Then, just pass instructions to the chip using the included code
+In order to test the design, hook up an arduino to the inputs of the chip, and map the pins of the Arduino such that each IO is somewhere you can read from it. Then, just pass instructions to the chip using the included code. You can reference the included ISA to see how to format instructions properly.
