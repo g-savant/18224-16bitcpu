@@ -7,7 +7,10 @@ This CPU interacts with an Arduino or Raspberry PI to accomplish standard CPU ta
 ## How it Works
 The way this chip works is that there is an input and output bus, and some components to do the computation. There is an ALU, a register file, an instruction register, a PC register, MAR, and MDR registers as well. The PC, MAR, and MDR registers all interact with the bus (reading to it and writing to it) while the other components do the computation. First the pc is sent to the Arduino, and on the cycles afterwards the Arduiino sends back the instruction from that PC. From there, the operation is completed and the output of that instruction is created (whether it is going to the register file, the MDR, MAR, etc). Then that keeps iterating until the SYS_END operation is found. That will terminate the operation of the CPU. 
 
-![](image1.png)
+![](images/image1.png)
+![](images/image2.png)
+![](images/image3.png)
+![](images/image4.png)
 
 
 ## Inputs/Outputs
