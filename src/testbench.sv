@@ -108,11 +108,11 @@ module test();
     a = 16'd5;
     b = 16'd6;
     result = a - b;
-    instr_memory[0] = {SUB, 3'd1, 3'd0, 3'd0, I_TYPE};
+    instr_memory[0] = {ADD, 3'd1, 3'd0, 3'd0, I_TYPE};
     instr_memory[1] = a;
-    instr_memory[2] = {SUB, 3'd2 , 3'd0, 3'd0, I_TYPE};
+    instr_memory[2] = {ADD, 3'd2 , 3'd0, 3'd0, I_TYPE};
     instr_memory[3] = b;
-    instr_memory[4] = {SUB, 3'd3, 3'd1 , 3'd2, R_TYPE};
+    instr_memory[4] = {SUB, 3'd3, 3'd2 , 3'd1, R_TYPE};
     instr_memory[5] = {SW, 3'b100, 3'd3, 3'd0, M_TYPE};
     instr_memory[6] = addr;
     instr_memory[7] = {LW, 3'b010, 3'd0, 3'd0, M_TYPE};
@@ -121,11 +121,11 @@ module test();
 
     run_code();
 
-    assert(data_memory[address] == result) begin
+    assert(data_memory[addr] == result) begin
       $display("Data memory accurate");
     end 
     else begin
-      $error ("Failed assertion! Memory at address %h should be %b but is %b", addr, result, $signed(data_memory[address]));
+      $error ("Failed assertion! Memory at address %h should be %b but is %b", addr, result, $signed(data_memory[addr]));
     end 
 
     assert(cpu.rf.reg_file[2] == result) begin
@@ -135,7 +135,7 @@ module test();
       $error ("Failed assertion! Register 2 should be %d but is %d", result, cpu.rf.reg_file[2]);
     end
 
-    $display("Subtract and Memory OP Test Case Passed!! Memory at address %h was %d, which is %d - %d.", addr, $signed(data_memory[address]), a, b);    
+    $display("Subtract and Memory OP Test Case Passed!! Memory at address %h was %d, which is %d - %d.", addr, $signed(data_memory[addr]), a, b);    
 
     result = a + b;
 
@@ -150,8 +150,8 @@ module test();
 
     run_code();
 
-    assert(data_memory[address] == result)
-    else $error ("Failed assertion! Memory at address %h should be %b but is %b", addr, result, $signed(data_memory[address]));
+    assert(data_memory[addr] == result)
+    else $error ("Failed assertion! Memory at address %h should be %b but is %b", addr, result, $signed(data_memory[addr]));
 
     assert(cpu.rf.reg_file[3] == result)
     else $error ("Failed assertion! Register 3 should be %d but is %d", result, cpu.rf.reg_file[3]);
@@ -162,11 +162,11 @@ module test();
     assert(cpu.rf.reg_file[2] == b)
     else $error ("Failed assertion! Register 2 should be %d but is %d", b, cpu.rf.reg_file[2]);
 
-    $display("Add Test Case Passed!! Memory at address %h was %d, which is %d + %d.", addr, $signed(data_memory[address]), a, b);
+    $display("Add Test Case Passed!! Memory at address %h was %d, which is %d + %d.", addr, $signed(data_memory[addr]), a, b);
 
 
-    a = 16'b1010;
-    b = 16'b1010;
+    a = 16'b1001010100101010;
+    b = 16'b1001001101001010;
     result = a & b;
 
     instr_memory[0] = {ADD, 3'd1, 3'd0, 3'd0, I_TYPE};
@@ -180,8 +180,8 @@ module test();
 
     run_code();
 
-    assert(data_memory[address] == result)
-    else $error ("Failed assertion! Memory at address %h should be %b but is %b", addr, result, $signed(data_memory[address]));
+    assert(data_memory[addr] == result)
+    else $error ("Failed assertion! Memory at address %h should be %b but is %b", addr, result, $signed(data_memory[addr]));
 
     assert(cpu.rf.reg_file[3] == result)
     else $error ("Failed assertion! Register 3 should be %d but is %d", result, cpu.rf.reg_file[3]);
@@ -192,11 +192,11 @@ module test();
     assert(cpu.rf.reg_file[2] == b)
     else $error ("Failed assertion! Register 2 should be %d but is %d", b, cpu.rf.reg_file[2]);
 
-    $display("AND Test Case Passed!! Memory at address %h was %d, which is %d + %d.", addr, $signed(data_memory[address]), a, b);
+    $display("AND Test Case Passed!! Memory at address %h was %b, which is %b & %b.", addr, $signed(data_memory[addr]), a, b);
 
 
-    a = 16'b1010;
-    b = 16'b1010;
+    a = 16'b0100_0101_0011_1000;
+    b = 16'b1001_0100_0101_0011;
     result = a | b;
 
     instr_memory[0] = {ADD, 3'd1, 3'd0, 3'd0, I_TYPE};
@@ -210,8 +210,8 @@ module test();
 
     run_code();
 
-    assert(data_memory[address] == result)
-    else $error ("Failed assertion! Memory at address %h should be %b but is %b", addr, result, $signed(data_memory[address]));
+    assert(data_memory[addr] == result)
+    else $error ("Failed assertion! Memory at address %h should be %b but is %b", addr, result, $signed(data_memory[addr]));
 
     assert(cpu.rf.reg_file[3] == result)
     else $error ("Failed assertion! Register 3 should be %d but is %d", result, cpu.rf.reg_file[3]);
@@ -222,7 +222,66 @@ module test();
     assert(cpu.rf.reg_file[2] == b)
     else $error ("Failed assertion! Register 2 should be %d but is %d", b, cpu.rf.reg_file[2]);
 
-    $display("OR Test Case Passed!! Memory at address %h was %d, which is %d + %d.", addr, $signed(data_memory[address]), a, b);
+    $display("OR Test Case Passed!! Memory at address %h was %b, which is %b | %b.", addr, $signed(data_memory[addr]), a, b);
+
+
+    a = 16'b11_1000;
+    b = 16'b011;
+    result = a >> (b & 16'h1F);;
+
+    instr_memory[0] = {ADD, 3'd1, 3'd0, 3'd0, I_TYPE};
+    instr_memory[1] = a;
+    instr_memory[2] = {ADD, 3'd2 , 3'd0, 3'd0, I_TYPE};
+    instr_memory[3] = b;
+    instr_memory[4] = {SRL, 3'd3, 3'd2 , 3'd1, R_TYPE};
+    instr_memory[5] = {SW, 3'd0, 3'd3, 3'd0, M_TYPE};
+    instr_memory[6] = addr;
+    instr_memory[7] = {'b0, SYS_END};
+
+    run_code();
+
+    assert(data_memory[addr] == result)
+    else $error("Failed assertion! Memory at address %h should be %b but is %b", addr, result, $signed(data_memory[addr]));
+
+    assert(cpu.rf.reg_file[3] == result)
+    else $error("Failed assertion! Register 3 should be %b but is %b", result, cpu.rf.reg_file[3]);
+
+    assert(cpu.rf.reg_file[1] == a)
+    else $error("Failed assertion! Register 1 should be %b but is %b", a, cpu.rf.reg_file[1]);
+
+    assert(cpu.rf.reg_file[2] == b)
+    else $error("Failed assertion! Register 2 should be %b but is %b", b, cpu.rf.reg_file[2]);
+
+    $display("SRL Test Case Passed!! Memory at address %h was %b, which is %b >> %b.", addr, $signed(data_memory[addr]), a, b);
+
+    a = 16'b10100010100111000;
+    b = 16'b011;
+    result = $signed(a) >> (b & 16'h1F);;
+
+    instr_memory[0] = {ADD, 3'd1, 3'd0, 3'd0, I_TYPE};
+    instr_memory[1] = a;
+    instr_memory[2] = {ADD, 3'd2 , 3'd0, 3'd0, I_TYPE};
+    instr_memory[3] = b;
+    instr_memory[4] = {SRA, 3'd3, 3'd2 , 3'd1, R_TYPE};
+    instr_memory[5] = {SW, 3'd0, 3'd3, 3'd0, M_TYPE};
+    instr_memory[6] = addr;
+    instr_memory[7] = {'b0, SYS_END};
+
+    run_code();
+
+    assert(data_memory[addr] == result)
+    else $error ("Failed assertion! Memory at address %h should be %b but is %b", addr, result, $signed(data_memory[addr]));
+
+    assert(cpu.rf.reg_file[3] == result)
+    else $error ("Failed assertion! Register 3 should be %d but is %d", result, cpu.rf.reg_file[3]);
+
+    assert(cpu.rf.reg_file[1] == a)
+    else $error ("Failed assertion! Register 1 should be %d but is %d", a, cpu.rf.reg_file[1]);
+
+    assert(cpu.rf.reg_file[2] == b)
+    else $error ("Failed assertion! Register 2 should be %d but is %d", b, cpu.rf.reg_file[2]);
+
+    $display("SRA Test Case Passed!! Memory at address %h was %b, which is signed %b >> %b.", addr, $signed(data_memory[addr]), a, b);
 
 
 
